@@ -62,6 +62,17 @@ const runMongo = async () => {
 		app.get("/", verifyToken, (req, res) => {
 			res.send("hello world")
 		})
+		app.get("/cars", async (req, res) => {
+			const query = {}
+			const limit = req.query.limit || 0
+			const cursor = carCollection
+				.find(query)
+				.sort({ _id: -1 })
+				.limit(+limit)
+
+			const result = await cursor.toArray()
+			res.send(result)
+		})
 		app.post("/add-car", async (req, res) => {
 			const carInfo = req.body
 			console.log(carInfo)
