@@ -21,10 +21,11 @@ const verifyToken = (req, res, next) => {
 	
 		jwt.verify(token, process.env.jwtSecret, (error, decoded) => {
 			if (error) {
-				res.status(401).send(error)
+				res.status(401).send('authorization failed')
 			} else {
+			
 				if (req.headers.email !== decoded.email) {
-					res.status(401).send("authorization failed")
+					res.status(403).send("forbidden request")
 				} else {
 					next()
 				}
