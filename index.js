@@ -62,6 +62,7 @@ const runMongo = async () => {
 		app.get("/", verifyToken, (req, res) => {
 			res.send("hello world")
 		})
+		app.post("/")
 	} finally {
 		//
 	}
