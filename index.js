@@ -41,12 +41,12 @@ app.post("/create-jwt-token", (req, res) => {
 	const token = jwt.sign({ email }, process.env.jwtSecret, {
 		expiresIn: "5hr",
 	})
-	res.send({token})
+	res.send({ token })
 })
 
 // Mongodb uri
 const uri = `mongodb+srv://${process.env.mongoUserName}:${process.env.mongoPassword}@cluster0.9iutd.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
-
+// console.log(uri);
 // Mongodb client
 const client = new MongoClient(uri, {
 	useNewUrlParser: true,
@@ -54,7 +54,7 @@ const client = new MongoClient(uri, {
 	serverApi: ServerApiVersion.v1,
 })
 
-// Mongodb
+// // Mongodb
 const runMongo = async () => {
 	try {
 		client.connect()
@@ -69,6 +69,6 @@ const runMongo = async () => {
 
 runMongo().catch(console.dir)
 
-app.listen(process.env.PORT || 5000, () =>
-	console.log("Server running on port " + 5000)
+app.listen(process.env.PORT || 4000, () =>
+	console.log("Server running on port " + 4000)
 )
