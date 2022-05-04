@@ -132,6 +132,11 @@ const runMongo = async () => {
 			const result = carCollection.deleteOne(query)
 			res.send({ delete: "deleted" })
 		})
+		app.get("/get-total", async (req, res) => {
+			const query = {}
+			const result = await carCollection.countDocuments(query)
+			res.send({result})
+		})
 	} finally {
 		//
 	}
