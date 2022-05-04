@@ -18,12 +18,11 @@ const verifyToken = (req, res, next) => {
 		res.send("token not found")
 	} else {
 		const token = bearer.split(" ")[1]
-	
+
 		jwt.verify(token, process.env.jwtSecret, (error, decoded) => {
 			if (error) {
-				res.status(401).send('authorization failed')
+				res.status(401).send("authorization failed")
 			} else {
-			
 				if (req.headers.email !== decoded.email) {
 					res.status(403).send("forbidden request")
 				} else {
@@ -66,13 +65,13 @@ const runMongo = async () => {
 			const result = await carCollection.findOne(query)
 			res.send(result)
 		})
-		app.get("/delivered/:id",  async (req, res) => {
+		app.get("/delivered/:id", async (req, res) => {
 			const query = { _id: ObjectId(req.params.id) }
 			const car = await carCollection.findOne(query)
-			const options = { upsert: true };
+			const options = { upsert: true }
 			if (car.stock == 1) {
 				const result = carCollection.deleteOne(query)
-				res.send({delete:'deleted'})
+				res.send({ delete: "deleted" })
 			} else {
 				const updatedDoc = {
 					$set: {
@@ -80,29 +79,34 @@ const runMongo = async () => {
 						stock: car.stock - 1,
 					},
 				}
-				const result = await carCollection.updateOne(query, updatedDoc, options)
+				const result = await carCollection.updateOne(
+					query,
+					updatedDoc,
+					options
+				)
 
 				res.send(result)
 			}
 		})
-		app.post('/add-car-stock/:id', verifyToken, async (req, res) => {
+		app.post("/add-car-stock/:id", verifyToken, async (req, res) => {
 			const carId = req.params.id
 			const query = { _id: ObjectId(carId) }
-			
 			const moreStock = +req.body.stock
-			const options = {upsert: true}
-		
+			const options = { upsert: true }
 			const car = await carCollection.findOne(query)
-		
 			const updatedDoc = {
 				$set: {
 					...car,
 					stock: +car.stock + moreStock,
 				},
 			}
-			const result = await carCollection.updateOne(query, updatedDoc, options)
+			const result = await carCollection.updateOne(
+				query,
+				updatedDoc,
+				options
+			)
 			res.send(result)
-		} )
+		})
 		app.get("/cars", async (req, res) => {
 			const query = {}
 			const limit = req.query.limit || 0
@@ -121,6 +125,12 @@ const runMongo = async () => {
 			}
 			const result = await carCollection.insertOne(updatedInfo)
 			res.send(result)
+		})
+		app.delete("/delete/car/:id", verifyToken, async (req, res) => {
+			const carId = req.params.id
+			const query = { _id: ObjectId(carId) }
+			const result = carCollection.deleteOne(query)
+			res.send({ delete: "deleted" })
 		})
 	} finally {
 		//
