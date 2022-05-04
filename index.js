@@ -1,7 +1,7 @@
 // import
 const express = require("express")
 const jwt = require("jsonwebtoken")
-const { MongoClient, ServerApiVersion } = require("mongodb")
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb")
 const cors = require("cors")
 const app = express()
 require("dotenv").config()
@@ -14,17 +14,15 @@ app.use(express.json())
 
 const verifyToken = (req, res, next) => {
 	const bearer = req?.headers?.authorization
-
 	if (!bearer) {
 		res.send("token not found")
 	} else {
 		const token = bearer.split(" ")[1]
-		console.log(token)
+		console.log(token);
 		jwt.verify(token, process.env.jwtSecret, (error, decoded) => {
 			if (error) {
-				res.status(401).send("authorization failed")
+				res.status(401).send(error)
 			} else {
-				console.log(decoded)
 				if (req.headers.email !== decoded.email) {
 					res.status(401).send("authorization failed")
 				} else {
@@ -46,7 +44,6 @@ app.post("/create-jwt-token", (req, res) => {
 
 // Mongodb uri
 const uri = `mongodb+srv://${process.env.mongoUserName}:${process.env.mongoPassword}@cluster0.9iutd.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
-// console.log(uri);
 // Mongodb client
 const client = new MongoClient(uri, {
 	useNewUrlParser: true,
@@ -62,6 +59,31 @@ const runMongo = async () => {
 		app.get("/", verifyToken, (req, res) => {
 			res.send("hello world")
 		})
+		app.get("/car/:id", async (req, res) => {
+			const carId = req.params.id
+			const query = { _id: ObjectId(carId) }
+			const result = await carCollection.findOne(query)
+			res.send(result)
+		})
+		app.get("/delivered/:id",  async (req, res) => {
+			const query = { _id: ObjectId(req.params.id) }
+			const car = await carCollection.findOne(query)
+			const options = { upsert: true };
+			if (car.stock == 1) {
+				const result = carCollection.deleteOne(query)
+				res.send({delete:'deleted'})
+			} else {
+				const updatedDoc = {
+					$set: {
+						...car,
+						stock: car.stock - 1,
+					},
+				}
+				const result = await carCollection.updateOne(query, updatedDoc, options)
+
+				res.send(result)
+			}
+		})
 		app.get("/cars", async (req, res) => {
 			const query = {}
 			const limit = req.query.limit || 0
@@ -73,9 +95,8 @@ const runMongo = async () => {
 			const result = await cursor.toArray()
 			res.send(result)
 		})
-		app.post("/add-car",verifyToken, async (req, res) => {
+		app.post("/add-car", verifyToken, async (req, res) => {
 			const carInfo = req.body
-			console.log(carInfo)
 			const updatedInfo = {
 				...carInfo,
 			}
