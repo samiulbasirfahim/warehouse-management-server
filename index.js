@@ -73,7 +73,7 @@ const runMongo = async () => {
 			const result = await cursor.toArray()
 			res.send(result)
 		})
-		app.post("/add-car", async (req, res) => {
+		app.post("/add-car",verifyToken, async (req, res) => {
 			const carInfo = req.body
 			console.log(carInfo)
 			const updatedInfo = {
