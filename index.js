@@ -18,7 +18,7 @@ const verifyToken = (req, res, next) => {
 		res.send("token not found")
 	} else {
 		const token = bearer.split(" ")[1]
-		console.log(token);
+	
 		jwt.verify(token, process.env.jwtSecret, (error, decoded) => {
 			if (error) {
 				res.status(401).send(error)
@@ -84,6 +84,24 @@ const runMongo = async () => {
 				res.send(result)
 			}
 		})
+		app.post('/add-car-stock/:id', verifyToken, async (req, res) => {
+			const carId = req.params.id
+			const query = { _id: ObjectId(carId) }
+			
+			const moreStock = +req.body.stock
+			const options = {upsert: true}
+		
+			const car = await carCollection.findOne(query)
+		
+			const updatedDoc = {
+				$set: {
+					...car,
+					stock: +car.stock + moreStock,
+				},
+			}
+			const result = await carCollection.updateOne(query, updatedDoc, options)
+			res.send(result)
+		} )
 		app.get("/cars", async (req, res) => {
 			const query = {}
 			const limit = req.query.limit || 0
