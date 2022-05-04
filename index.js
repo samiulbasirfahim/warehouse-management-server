@@ -64,6 +64,7 @@ const runMongo = async () => {
 		})
 		app.post("/add-car", async (req, res) => {
 			const carInfo = req.body
+			console.log(carInfo)
 			const updatedInfo = {
 				...carInfo,
 			}
