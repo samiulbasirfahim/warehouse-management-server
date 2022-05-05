@@ -109,10 +109,12 @@ const runMongo = async () => {
 		})
 		app.get("/cars", async (req, res) => {
 			const query = {}
-			const limit = req.query.limit || 0
+			const limit = +req.query.limit || 0
+			const page = req.query.page || 0
 			const cursor = carCollection
 				.find(query)
 				.sort({ _id: -1 })
+				.skip(+page * limit)
 				.limit(+limit)
 
 			const result = await cursor.toArray()
@@ -135,7 +137,7 @@ const runMongo = async () => {
 		app.get("/get-total", async (req, res) => {
 			const query = {}
 			const result = await carCollection.countDocuments(query)
-			res.send({result})
+			res.send({ result })
 		})
 	} finally {
 		//
