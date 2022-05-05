@@ -110,7 +110,7 @@ const runMongo = async () => {
 		app.get("/cars", async (req, res) => {
 			const query = {}
 			const limit = +req.query.limit || 0
-			const page = req.query.pages || 0
+			const page = req.query.page || 0
 			const cursor = carCollection
 				.find(query)
 				.sort({ _id: -1 })
