@@ -59,17 +59,29 @@ const runMongo = async () => {
 		app.get("/", verifyToken, (req, res) => {
 			res.send("hello world")
 		})
+
+		// delete car collection api ()
+		// app.get("/deleteAllCar", (req, res) => {
+		// 	const result = carCollection.deleteMany()
+		// 	res.send(result)
+		// })
 		const reviewCollection = client.db("rapid-dealer").collection("review")
+
+		// add review api
 		app.post("/add-review", verifyToken, async (req, res) => {
 			const review = req.body
 			const result = await reviewCollection.insertOne(review)
 			res.send(result)
 		})
+
+		// get review api
 		app.get("/review", async (req, res) => {
 			const cursor = reviewCollection.find({}).limit(3).sort({ _id: -1 })
 			const result = await cursor.toArray()
 			res.send(result)
 		})
+
+		// get all my added car api
 		app.get("/my-cars", verifyToken, async (req, res) => {
 			const email = req.headers.email
 			const query = { addedBy: email }
@@ -77,12 +89,16 @@ const runMongo = async () => {
 			const result = await cursor.toArray()
 			res.send(result)
 		})
+
+		// get car by id api
 		app.get("/car/:id", async (req, res) => {
 			const carId = req.params.id
 			const query = { _id: ObjectId(carId) }
 			const result = await carCollection.findOne(query)
 			res.send(result)
 		})
+
+		// delivere car api
 		app.get("/delivered/:id", async (req, res) => {
 			const query = { _id: ObjectId(req.params.id) }
 			const car = await carCollection.findOne(query)
@@ -113,6 +129,8 @@ const runMongo = async () => {
 				res.send(result)
 			}
 		})
+
+		// Increase car stock api
 		app.post("/add-car-stock/:id", verifyToken, async (req, res) => {
 			const carId = req.params.id
 			const query = { _id: ObjectId(carId) }
@@ -132,6 +150,8 @@ const runMongo = async () => {
 			)
 			res.send(result)
 		})
+
+		// get all car api
 		app.get("/cars", async (req, res) => {
 			const query = {}
 			const limit = +req.query.limit || 0
@@ -147,6 +167,8 @@ const runMongo = async () => {
 			const result = await cursor.toArray()
 			res.send(result)
 		})
+
+		// Add car api
 		app.post("/add-car", verifyToken, async (req, res) => {
 			const carInfo = req.body
 			const updatedInfo = {
@@ -155,17 +177,23 @@ const runMongo = async () => {
 			const result = await carCollection.insertOne(updatedInfo)
 			res.send(result)
 		})
+
+		// Delete car api
 		app.delete("/delete/car/:id", verifyToken, async (req, res) => {
 			const carId = req.params.id
 			const query = { _id: ObjectId(carId) }
 			const result = carCollection.deleteOne(query)
 			res.send({ delete: "deleted" })
 		})
+
+		// Get total number of car
 		app.get("/get-total", async (req, res) => {
 			const query = {}
 			const result = await carCollection.countDocuments(query)
 			res.send({ result })
 		})
+
+		// Edit car information api
 		app.post("/edit-car/:id", verifyToken, async (req, res) => {
 			const query = { _id: ObjectId(req.params.id) }
 			const car = await carCollection.findOne(query)
