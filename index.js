@@ -59,6 +59,13 @@ const runMongo = async () => {
 		app.get("/", verifyToken, (req, res) => {
 			res.send("hello world")
 		})
+		app.get("/my-cars", verifyToken,async (req, res) => {
+			const email = req.headers.email
+			const query = {addedBy:email}
+			const cursor = await carCollection.find(query)
+			const result = await cursor.toArray()
+			res.send(result)
+		})
 		app.get("/car/:id", async (req, res) => {
 			const carId = req.params.id
 			const query = { _id: ObjectId(carId) }
@@ -111,6 +118,8 @@ const runMongo = async () => {
 			const query = {}
 			const limit = +req.query.limit || 0
 			const page = req.query.page || 0
+			console.log(limit);
+			console.log(page);
 			const cursor = carCollection
 				.find(query)
 				.sort({ _id: -1 })
