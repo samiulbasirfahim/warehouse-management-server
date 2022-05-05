@@ -87,10 +87,18 @@ const runMongo = async () => {
 			const query = { _id: ObjectId(req.params.id) }
 			const car = await carCollection.findOne(query)
 			const options = { upsert: true }
+
+			/* 
 			if (car.stock == 1) {
 				const result = carCollection.deleteOne(query)
 				res.send({ delete: "deleted" })
-			} else {
+			} 
+			 */
+			if (car.stock === 0) {
+				res.send({ faild: "out of stock" })
+			} 
+			
+			else {
 				const updatedDoc = {
 					$set: {
 						...car,
