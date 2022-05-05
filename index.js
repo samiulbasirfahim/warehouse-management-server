@@ -59,9 +59,15 @@ const runMongo = async () => {
 		app.get("/", verifyToken, (req, res) => {
 			res.send("hello world")
 		})
-		app.get("/my-cars", verifyToken,async (req, res) => {
+		const reviewCollection = client.db("rapid-dealer").collection("review")
+		app.post("/add-review", verifyToken, async(req, res) => {
+			const review = req.body
+			const result = await reviewCollection.insertOne(review)
+			res.send(result);
+		})
+		app.get("/my-cars", verifyToken, async (req, res) => {
 			const email = req.headers.email
-			const query = {addedBy:email}
+			const query = { addedBy: email }
 			const cursor = await carCollection.find(query)
 			const result = await cursor.toArray()
 			res.send(result)
@@ -118,8 +124,8 @@ const runMongo = async () => {
 			const query = {}
 			const limit = +req.query.limit || 0
 			const page = req.query.page || 0
-			console.log(limit);
-			console.log(page);
+			console.log(limit)
+			console.log(page)
 			const cursor = carCollection
 				.find(query)
 				.sort({ _id: -1 })
@@ -148,17 +154,21 @@ const runMongo = async () => {
 			const result = await carCollection.countDocuments(query)
 			res.send({ result })
 		})
-		app.post("/edit-car/:id",verifyToken, async(req, res) => {
-			const query = {_id: ObjectId(req.params.id)}
+		app.post("/edit-car/:id", verifyToken, async (req, res) => {
+			const query = { _id: ObjectId(req.params.id) }
 			const car = await carCollection.findOne(query)
 			const carInfo = req.body
 			const options = { upsert: true }
 			const updatedDoc = {
 				$set: {
-					...carInfo
-				}
+					...carInfo,
+				},
 			}
-			const result = await carCollection.updateOne(query, updatedDoc, options)
+			const result = await carCollection.updateOne(
+				query,
+				updatedDoc,
+				options
+			)
 			res.send(result)
 		})
 	} finally {
