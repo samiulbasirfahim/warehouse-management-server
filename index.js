@@ -96,13 +96,12 @@ const runMongo = async () => {
 			 */
 			if (car.stock === 0) {
 				res.send({ faild: "out of stock" })
-			} 
-			
-			else {
+			} else {
 				const updatedDoc = {
 					$set: {
 						...car,
 						stock: car.stock - 1,
+						sold: +car.sold + 1,
 					},
 				}
 				const result = await carCollection.updateOne(
