@@ -60,10 +60,15 @@ const runMongo = async () => {
 			res.send("hello world")
 		})
 		const reviewCollection = client.db("rapid-dealer").collection("review")
-		app.post("/add-review", verifyToken, async(req, res) => {
+		app.post("/add-review", verifyToken, async (req, res) => {
 			const review = req.body
 			const result = await reviewCollection.insertOne(review)
-			res.send(result);
+			res.send(result)
+		})
+		app.get("/review", async (req, res) => {
+			const cursor = reviewCollection.find({}).limit(3).sort({ _id: -1 })
+			const result = await cursor.toArray()
+			res.send(result)
 		})
 		app.get("/my-cars", verifyToken, async (req, res) => {
 			const email = req.headers.email
