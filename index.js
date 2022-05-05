@@ -148,6 +148,19 @@ const runMongo = async () => {
 			const result = await carCollection.countDocuments(query)
 			res.send({ result })
 		})
+		app.post("/edit-car/:id",verifyToken, async(req, res) => {
+			const query = {_id: ObjectId(req.params.id)}
+			const car = await carCollection.findOne(query)
+			const carInfo = req.body
+			const options = { upsert: true }
+			const updatedDoc = {
+				$set: {
+					...carInfo
+				}
+			}
+			const result = await carCollection.updateOne(query, updatedDoc, options)
+			res.send(result)
+		})
 	} finally {
 		//
 	}
