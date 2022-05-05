@@ -37,7 +37,7 @@ const verifyToken = (req, res, next) => {
 app.post("/create-jwt-token", (req, res) => {
 	const email = req.body.email
 	const token = jwt.sign({ email }, process.env.jwtSecret, {
-		expiresIn: "5hr",
+		expiresIn: "2d",
 	})
 	res.send({ token })
 })
