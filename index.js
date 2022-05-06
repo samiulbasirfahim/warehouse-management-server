@@ -85,7 +85,7 @@ const runMongo = async () => {
 		app.get("/my-cars", verifyToken, async (req, res) => {
 			const email = req.headers.email
 			const query = { addedBy: email }
-			const cursor = await carCollection.find(query)
+			const cursor = await carCollection.find(query).sort({ _id: -1 })
 			const result = await cursor.toArray()
 			res.send(result)
 		})
