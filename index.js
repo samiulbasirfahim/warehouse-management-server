@@ -167,6 +167,24 @@ const runMongo = async () => {
 			const result = await cursor.toArray()
 			res.send(result)
 		})
+		app.get("/car-random", async (req, res) => {
+			const total = await carCollection.countDocuments({})
+			const generateRandom = () => {
+				const random = parseInt(Math.floor(Math.random() * total))
+				if (random >= 0 && random < total) {
+					return random
+				} else {
+					return generateRandom
+				}
+			}
+			const randomNumber = generateRandom()
+			const cursor = await carCollection
+				.find({})
+				.limit(1)
+				.skip(randomNumber)
+			const result = await cursor.toArray()
+			res.send(result)
+		})
 
 		// Add car api
 		app.post("/add-car", verifyToken, async (req, res) => {
